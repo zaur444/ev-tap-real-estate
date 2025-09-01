@@ -1,0 +1,23 @@
+{
+  "name": "Ev Tap - Real Estate App",
+  "short_name": "Ev Tap",
+  "description": "Find your dream property in Baku with Ev Tap - the modern real estate platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["real estate", "property", "housing"],
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false
+}
