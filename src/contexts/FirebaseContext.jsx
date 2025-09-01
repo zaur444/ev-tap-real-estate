@@ -1,16 +1,7 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { onAuthStateChange } from '../firebase/auth';
 import { getUserProfile } from '../firebase/database';
-
-const FirebaseContext = createContext();
-
-export const useFirebase = () => {
-  const context = useContext(FirebaseContext);
-  if (!context) {
-    throw new Error('useFirebase must be used within a FirebaseProvider');
-  }
-  return context;
-};
+import { FirebaseContext } from './FirebaseContext';
 
 export const FirebaseProvider = ({ children }) => {
   const [user, setUser] = useState(null);

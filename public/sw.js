@@ -1,9 +1,9 @@
 const CACHE_NAME = 'ev-tap-v1';
 const urlsToCache = [
   '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
-  '/manifest.json'
+  '/index.html',
+  '/manifest.json',
+  '/vite.svg'
 ];
 
 self.addEventListener('install', (event) => {

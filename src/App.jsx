@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { FirebaseProvider, useFirebase } from './contexts/FirebaseContext';
-import { getProperties, subscribeToProperties, trackPropertyView } from './firebase/database';
+import { FirebaseProvider } from './contexts/FirebaseContext.jsx';
+import { LanguageProvider } from './contexts/LanguageContext.jsx';
+import { useFirebase } from './hooks/useFirebase';
+import { useLanguage } from './hooks/useLanguage';
+import { subscribeToProperties, trackPropertyView } from './firebase/database';
 import AuthModal from './components/AuthModal';
 import FirebaseStatus from './components/FirebaseStatus';
 
@@ -436,9 +439,10 @@ function PropertyValuation({ property }) {
 
 // Main App Component with Firebase integration
 function AppContent() {
-  const { user, userProfile, loading } = useFirebase();
+  const { user, userProfile } = useFirebase();
+  const { language, changeLanguage, t } = useLanguage();
   const [properties, setProperties] = useState(MOCK_PROPERTIES);
-  const [useFirebaseData, setUseFirebaseData] = useState(false);
+  const [useFirebaseData] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     type: 'buy',
@@ -459,7 +463,7 @@ function AppContent() {
   const [darkMode, setDarkMode] = useState(false);
   const [showComparisonModal, setShowComparisonModal] = useState(false);
   const [showFavoritesModal, setShowFavoritesModal] = useState(false);
-  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  // const [showAdvancedSearch] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState('signin');
 
@@ -582,8 +586,8 @@ function AppContent() {
             </svg>
           </div>
           <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Ev Tap</h1>
-            <p className="text-xs text-gray-500 -mt-1">Find Your Dream Property</p>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">{t('appTitle')}</h1>
+            <p className="text-xs text-gray-500 -mt-1">{t('appSubtitle')}</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -603,6 +607,22 @@ function AppContent() {
               </svg>
             )}
           </button>
+
+          {/* Language Switcher */}
+          <div className="relative">
+            <select
+              value={language}
+              onChange={(e) => changeLanguage(e.target.value)}
+              className={`p-2 rounded-lg transition-colors text-sm font-medium border-0 bg-transparent cursor-pointer ${
+                darkMode 
+                  ? 'text-gray-300 hover:text-white hover:bg-gray-700' 
+                  : 'text-gray-600 hover:text-blue-600 hover:bg-gray-100'
+              }`}
+            >
+              <option value="en">🇺🇸 EN</option>
+              <option value="az">🇦🇿 AZ</option>
+            </select>
+          </div>
 
           {/* Comparison Button */}
           {comparisonList.length > 0 && (
@@ -658,13 +678,13 @@ function AppContent() {
                 onClick={handleLogin}
                 className="px-4 py-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors font-medium"
               >
-                Sign In
+                {t('signIn')}
               </button>
               <button 
                 onClick={handleSignup}
                 className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 font-medium"
               >
-                Sign Up
+                {t('signUp')}
               </button>
             </div>
           )}
@@ -676,11 +696,11 @@ function AppContent() {
           {/* Filter Sidebar */}
           <aside className="w-full lg:w-1/4 p-6 bg-white rounded-2xl shadow-lg border border-gray-100 h-fit sticky top-24">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-800">Filters</h2>
+              <h2 className="text-xl font-bold text-gray-800">{t('filters')}</h2>
             </div>
             
             <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-700 mb-3">Transaction Type</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">{t('transactionType')}</label>
               <div className="flex rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <button
                   onClick={() => setFilters(f => ({ ...f, type: 'buy' }))}
@@ -690,7 +710,7 @@ function AppContent() {
                       : 'bg-white text-gray-700 hover:bg-gray-50'
                   }`}
                 >
-                  Buy
+                  {t('buy')}
                 </button>
                 <button
                   onClick={() => setFilters(f => ({ ...f, type: 'rent' }))}
@@ -700,21 +720,21 @@ function AppContent() {
                       : 'bg-white text-gray-700 hover:bg-gray-50'
                   }`}
                 >
-                  Rent
+                  {t('rent')}
                 </button>
               </div>
             </div>
 
             <div className="space-y-5">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">District</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('district')}</label>
                 <select 
                   name="district" 
                   value={filters.district} 
                   onChange={(e) => setFilters(f => ({ ...f, district: e.target.value }))} 
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm"
                 >
-                  <option value="">All Districts</option>
+                  <option value="">{t('allDistricts')}</option>
                   <option value="Yasamal">Yasamal</option>
                   <option value="Khatai">Khatai</option>
                   <option value="Sabayil">Sabayil</option>
@@ -724,35 +744,35 @@ function AppContent() {
               </div>
               
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Property Type</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('propertyType')}</label>
                 <select 
                   name="propertyType" 
                   value={filters.propertyType} 
                   onChange={(e) => setFilters(f => ({ ...f, propertyType: e.target.value }))} 
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm"
                 >
-                  <option value="">All Types</option>
-                  <option value="apartment">Apartment</option>
-                  <option value="house">House</option>
-                  <option value="villa">Villa</option>
-                  <option value="commercial">Commercial</option>
+                  <option value="">{t('allTypes')}</option>
+                  <option value="apartment">{t('apartment')}</option>
+                  <option value="house">{t('house')}</option>
+                  <option value="villa">{t('villa')}</option>
+                  <option value="commercial">{t('commercial')}</option>
                 </select>
               </div>
 
               {/* Price Range */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Price Range (AZN)</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('priceRange')}</label>
                 <div className="grid grid-cols-2 gap-2">
                   <input
                     type="number"
-                    placeholder="Min"
+                    placeholder={t('min')}
                     value={filters.minPrice}
                     onChange={(e) => setFilters(f => ({ ...f, minPrice: e.target.value }))}
                     className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm text-sm"
                   />
                   <input
                     type="number"
-                    placeholder="Max"
+                    placeholder={t('max')}
                     value={filters.maxPrice}
                     onChange={(e) => setFilters(f => ({ ...f, maxPrice: e.target.value }))}
                     className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm text-sm"
@@ -762,13 +782,13 @@ function AppContent() {
 
               {/* Rooms */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Minimum Rooms</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('minimumRooms')}</label>
                 <select 
                   value={filters.minRooms} 
                   onChange={(e) => setFilters(f => ({ ...f, minRooms: e.target.value }))} 
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm"
                 >
-                  <option value="">Any</option>
+                  <option value="">{t('any')}</option>
                   <option value="1">1+</option>
                   <option value="2">2+</option>
                   <option value="3">3+</option>
@@ -779,7 +799,7 @@ function AppContent() {
 
               {/* Advanced Filters */}
               <div className="border-t border-gray-200 pt-4">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Advanced Filters</h3>
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">{t('advancedFilters')}</h3>
                 
                 <div className="space-y-3">
                   <label className="flex items-center">
@@ -789,7 +809,7 @@ function AppContent() {
                       onChange={(e) => setFilters(f => ({ ...f, isNewBuild: e.target.checked }))}
                       className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                     />
-                    <span className="ml-2 text-sm text-gray-700">New Build Only</span>
+                    <span className="ml-2 text-sm text-gray-700">{t('newBuildOnly')}</span>
                   </label>
                   
                   <label className="flex items-center">
@@ -799,7 +819,7 @@ function AppContent() {
                       onChange={(e) => setFilters(f => ({ ...f, nearMetro: e.target.checked }))}
                       className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                     />
-                    <span className="ml-2 text-sm text-gray-700">Near Metro</span>
+                    <span className="ml-2 text-sm text-gray-700">{t('nearMetro')}</span>
                   </label>
                   
                   <label className="flex items-center">
@@ -809,7 +829,7 @@ function AppContent() {
                       onChange={(e) => setFilters(f => ({ ...f, isVerified: e.target.checked }))}
                       className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                     />
-                    <span className="ml-2 text-sm text-gray-700">Verified Only</span>
+                    <span className="ml-2 text-sm text-gray-700">{t('verifiedOnly')}</span>
                   </label>
                 </div>
               </div>
@@ -829,7 +849,7 @@ function AppContent() {
                 })}
                 className="w-full px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200 text-sm font-medium"
               >
-                Clear All Filters
+                {t('clearAllFilters')}
               </button>
             </div>
           </aside>
@@ -845,7 +865,7 @@ function AppContent() {
               </div>
               <input
                 type="text"
-                placeholder="Search properties by title, district, or address..."
+                placeholder={t('searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm text-gray-700 placeholder-gray-400"
@@ -854,7 +874,7 @@ function AppContent() {
             
             <div className="flex items-center justify-between mb-6">
               <p className="text-gray-600 font-medium">
-                Showing <span className="text-blue-600 font-semibold">{filteredProperties.length}</span> of <span className="text-gray-800 font-semibold">{properties.length}</span> results
+                {t('showingResults')} <span className="text-blue-600 font-semibold">{filteredProperties.length}</span> {t('of')} <span className="text-gray-800 font-semibold">{properties.length}</span> {t('results')}
               </p>
             </div>
             
@@ -936,11 +956,11 @@ function AppContent() {
                     <div className="p-5">
                       <div className="flex items-start justify-between mb-3">
                         <p className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-                          {property.price.toLocaleString()} AZN 
-                          {property.type === 'rent' && <span className="text-sm text-gray-500 font-normal">/ month</span>}
+                          {property.price.toLocaleString()} {t('azn')} 
+                          {property.type === 'rent' && <span className="text-sm text-gray-500 font-normal">/ {t('month')}</span>}
                         </p>
                         <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full font-medium capitalize">
-                          {property.propertyType}
+                          {t(property.propertyType)}
                         </span>
                       </div>
                       
@@ -963,13 +983,13 @@ function AppContent() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 21v-4a2 2 0 012-2h4a2 2 0 012 2v4" />
                             </svg>
-                            <span className="font-medium">{property.rooms} rooms</span>
+                            <span className="font-medium">{property.rooms} {t('rooms')}</span>
                           </span>
                           <span className="flex items-center bg-gray-50 px-3 py-1.5 rounded-lg">
                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                             </svg>
-                            <span className="font-medium">{property.area} m²</span>
+                            <span className="font-medium">{property.area} {t('m2')}</span>
                           </span>
                         </div>
                         {property.nearMetro && (
@@ -977,7 +997,7 @@ function AppContent() {
                             <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                             </svg>
-                            Metro
+{t('metro')}
                           </span>
                         )}
                       </div>
@@ -992,8 +1012,8 @@ function AppContent() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">No properties found</h3>
-                <p className="text-gray-500 mb-4">Try adjusting your filters to see more results.</p>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">{t('noPropertiesFound')}</h3>
+                <p className="text-gray-500 mb-4">{t('tryAdjustingFilters')}</p>
                 <button 
                   onClick={() => {
                     setFilters({ type: 'buy', district: '', propertyType: '' });
@@ -1001,7 +1021,7 @@ function AppContent() {
                   }}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
                 >
-                  Clear All Filters
+                  {t('clearAllFilters')}
                 </button>
               </div>
             )}
@@ -1011,7 +1031,7 @@ function AppContent() {
         {/* Recently Viewed Section */}
         {recentlyViewed.length > 0 && (
           <div className="mt-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Recently Viewed</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">{t('recentlyViewed')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {recentlyViewed.slice(0, 4).map(property => (
                 <div 
@@ -1398,12 +1418,14 @@ function AppContent() {
   );
 }
 
-// Main App Component with Firebase Provider
+// Main App Component with Firebase and Language Providers
 function App() {
   return (
-    <FirebaseProvider>
-      <AppContent />
-    </FirebaseProvider>
+    <LanguageProvider>
+      <FirebaseProvider>
+        <AppContent />
+      </FirebaseProvider>
+    </LanguageProvider>
   );
 }
 

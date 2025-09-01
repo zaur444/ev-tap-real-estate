@@ -15,7 +15,7 @@ const FirebaseStatus = () => {
           setStatus('error');
           setError(result.error);
         }
-      } catch (error) {
+      } catch {
         setStatus('error');
         setError('Firebase not configured. Please check your configuration.');
       }
